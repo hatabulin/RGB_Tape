@@ -15,10 +15,10 @@ send: EFFECT_CONFIG:01.1.1.0.FF.80.77.00.00
 - use channel 1: 1 (true)
 - use channel 2: 1 (true)
 - use channel 3: 0 (false)
-- data PWM - red = 	FF
-- data PWM - green = 	80
-- data PWM - blue = 	77
-- data delay/freq blink... - 00
+- data PWM - red = 	0xFF
+- data PWM - green = 	0x80
+- data PWM - blue = 	0x77
+- data delay/freq blink... - 0x00
 - data delay between changes (for effect 2)
 
 
