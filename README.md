@@ -3,7 +3,8 @@ stm32 rgb controller
 
 MCU: stm32f103c8t6
 
-HAL-Driver,
+HAL-Driver, Free RTOS.
+
 Build tools: CubeMX 4.27 & Atollic TrueStudio 9.3
 
 Controlled via USB port with scripts:
