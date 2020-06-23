@@ -2,12 +2,10 @@
 stm32 rgb controller
 
 MCU: stm32f103c8t6
-
-HAL-Driver, Free RTOS.
-
+Middlewares: Free RTOS, USB STM32 Virtual Comport.
 Build tools: CubeMX 4.27 & Atollic TrueStudio 9.3
 
-Controlled via USB port with scripts:
+USB protocol:
 
 Command 1:
 ======= 
@@ -28,7 +26,7 @@ Effect 1 - change color.
 Usage:
 EFFECT_CONFIG:01.<use red chnl>.<use green chnl>.<use blue chnl>.<red value>.<green value>.<blue value>.<pwm delay>.<pause delay>
 
-EFFECT-2 - change color and restore (flash)
+EFFECT-2 - change color same prev. effect and restore to previous color state (flash)
 Usage:
 EFFECT_CONFIG:02.<use red chnl>.<use green chnl>.<use blue chnl>.<red value>.<green value>.<blue value>.<pwm delay>.<pause delay>
 
