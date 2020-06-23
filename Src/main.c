@@ -101,31 +101,26 @@ void ReadConstantsFromEEP(void);
 /* USER CODE END PFP */
 
 /* USER CODE BEGIN 0 */
-void ReadEEprom(void)
-{
+void ReadEEprom(void) {
 	uint32_t data_;
 	EE_Read(EEP_CHECK_ADDR,&data_);
-	if (data_!= CHECK_DATA)
-	{
+	if (data_!= CHECK_DATA) {
 		EE_Format();
 		WriteDefaultsConstantToEEP();
 		EE_Write(EEP_CHECK_ADDR,CHECK_DATA);
 		ReadConstantsFromEEP();
-	 } else
-	 {
-		 ReadConstantsFromEEP();
-	 }
+	} else {
+		ReadConstantsFromEEP();
+	}
 }
 
-void WriteDefaultsConstantToEEP(void)
-{
+void WriteDefaultsConstantToEEP(void) {
 	EE_Write(EEP_red, 0xFF0000); //
 	EE_Write(EEP_green, 0x00FF00); //
 	EE_Write(EEP_yellow, 0xFFFF00); //
 }
 
-void WriteValuesToEEprom()
-{
+void WriteValuesToEEprom() {
 	uint32_t data_;
 	data_ = red.red << 16 | red.green << 8 | red.blue;
 	EE_Write(EEP_red, data_);
@@ -134,8 +129,8 @@ void WriteValuesToEEprom()
 	data_ = yellow.red << 16 | yellow.green << 8 | yellow.blue;
 	EE_Write(EEP_yellow, data_);
 }
-void ReadConstantsFromEEP(void)
-{
+
+void ReadConstantsFromEEP(void) {
 	uint32_t data_;
 	EE_Read(EEP_red, &data_);red.red = (data_ >> 16) & 0xFF;red.green = (data_ >> 8) & 0xFF;red.blue = data_ & 0xFF;
 	EE_Read(EEP_green, &data_);green.red = data_ >> 16;green.green = data_ >> 8;green.blue = data_ ;
@@ -149,8 +144,7 @@ void ReadConstantsFromEEP(void)
   *
   * @retval None
   */
-int main(void)
-{
+int main(void) {
   /* USER CODE BEGIN 1 */
     uint32_t i;
 
@@ -183,16 +177,15 @@ int main(void)
   HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_2);
   HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_3);
 
-    for(i=0;i<=1536;i++)
-    {
-  	  if(i<256) RED=i;
-        else if ((i>255)&&(i<512)) RED=512-i;
-        else if ((i>511)&&(i<768)) GREEN= i-768;
-        else if ((i>767)&&(i<1024)) GREEN=1024-i;
-        else if ((i>1023)&&(i<1280)) BLUE=i-1280;
-        else if ((i>1279)&&(i<1536)) BLUE=1536-i;
+  for(i=0;i<=1536;i++) {
+	  if(i<256) RED=i;
+      else if ((i>255)&&(i<512)) RED=512-i;
+      else if ((i>511)&&(i<768)) GREEN= i-768;
+      else if ((i>767)&&(i<1024)) GREEN=1024-i;
+      else if ((i>1023)&&(i<1280)) BLUE=i-1280;
+      else if ((i>1279)&&(i<1536)) BLUE=1536-i;
   	  HAL_Delay(0);
-    }
+  }
 
   ReadEEprom();
 
@@ -433,23 +426,19 @@ static void MX_GPIO_Init(void)
   * @param  htim: TIM handle
   * @retval None
   */
-void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
-{
-    if (htim->Instance == htim2.Instance)
-    {
-        sec++;
-        if (sec>data.freq-1)
-        {
-      	  sec=0;
-      	  switch (data.channel)
-      	  {
-  	  	  	  case 0: { if (RED == ZERO) RED = 255; else RED = ZERO; } break;
-  	  	  	  case 1: { if (BLUE == ZERO) BLUE = 255; else BLUE = ZERO; } break;
-  	  	  	  case 2: { if (GREEN == ZERO) GREEN = 255; else GREEN = ZERO; } break;
-      	  }
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
+	if (htim->Instance == htim2.Instance) {
+		sec++;
+        if (sec>data.freq-1) {
+        	sec=0;
+        	switch (data.channel) {
+        	case 0: { if (RED == ZERO) RED = 255; else RED = ZERO; } break;
+  	  	  	case 1: { if (BLUE == ZERO) BLUE = 255; else BLUE = ZERO; } break;
+  	  	  	case 2: { if (GREEN == ZERO) GREEN = 255; else GREEN = ZERO; } break;
+        	}
   	  //dhcp_n6sec_tick();
         }
-    }
+	}
 }
 
 void ChangeColors(effectConfig effect_config) {
@@ -531,148 +520,123 @@ void StartDefaultTask(void const * argument)
   osThreadDef(effectsTask, StartEffectsTask, osPriorityNormal, 0, 256);
   effectsTaskHandle = osThreadCreate(osThread(effectsTask), NULL);
 
-  for(;;)
-  {
-	  if (flag_usb == SAVE_CFG)
-	  {
+  for(;;) {
+	  if (flag_usb == SAVE_CFG) {
 		  snprintf(str,strlen(str),"SAVE_CFG - success !\n\r");
 		  CDC_Transmit_FS(str, 25);
 
 		  WriteValuesToEEprom();
 		  flag_usb = 0;
 	  }
-	  if (flag_usb == CHANNEL_TUNNING)
-	  {
-		  switch (conf_channel)
-		  {
+
+	  if (flag_usb == CHANNEL_TUNNING) {
+		  switch (conf_channel) {
 		  	  case 0:
-		  	  {
 		  		  red.red = red_value;
 		  		  red.green = green_value;
 		  		  red.blue = blue_value;
-		  	  } break;
+		  		  break;
 		  	  case 1:
-		  	  {
 		  		  yellow.red = red_value;
 		  		  yellow.green = green_value;
 		  		  yellow.blue = blue_value;
-		  	  } break;
+		  		  break;
 		  	  case 2:
-		  	  {
 		  		  green.red = red_value;
 		  		  green.green = green_value;
 		  		  green.blue = blue_value;
-		  	  } break;
+		  		  break;
 		  }
 		  data.dirty = true;
 		  flag_usb = 0;
 	  }
 
-	  if (data.mode == NORMAL_MODE)
-	  {
-		  if (data.dirty)
-		  {
+	  if (data.mode == NORMAL_MODE) {
+		  if (data.dirty) {
 			  TIM1->CCR3 = 0;
 			  TIM1->CCR2 = 0;
 			  TIM1->CCR1 = 0;
 			  data.dirty = false;
-			  switch (data.channel)
-			  {
+			  switch (data.channel) {
 	  	  	  	  case 0:
-	  	  	  	  {
 	  	  	  		  RED = red.red;
 	  	  	  		  GREEN = red.green;
 	  	  	  		  BLUE = red.blue;
-	  	  	  	  } break;
+	  	  	  	  break;
 	  	  	  	  case 1:
-	  	  	  	  {
 	  	  	  		  RED = yellow.red;
 	  	  	  		  GREEN = yellow.green;
 	  	  	  		  BLUE = yellow.blue;
-	  	  	  	  } break;
+	  	  	  	  break;
 	  	  	  	  case 2:
-	  	  	  	  {
 	  	  	  		  RED = green.red;
 	  	  	  		  GREEN = green.green;
 	  	  	  		  BLUE = green.blue;
-	  	  	  	  } break;
+	  	  	  	  break;
 			  }
 		  }
 	  } else
-	  if ((data.mode == BLINK_MODE))// & (data.dirty) ) // if Mode 2 (Blink light)
-	  {
-		  if (data.dirty)
-		  {
-			  TIM1->CCR3 = 0;
-			  TIM1->CCR2 = 0;
-			  TIM1->CCR1 = 0;
-			  data.dirty = false;
-		  }
+		  if ((data.mode == BLINK_MODE)) { // & (data.dirty) ) // if Mode 2 (Blink light)
+			  if (data.dirty) {
+				  TIM1->CCR3 = 0;
+				  TIM1->CCR2 = 0;
+				  TIM1->CCR1 = 0;
+				  data.dirty = false;
+			  }
 
-		  flag_blynk =  1 - flag_blynk ;
-		  switch (data.channel)
-		  {
-  	  	  	  case 0:
-  	  	  	  {
-  	  	  		  RED = red.red * flag_blynk;
-  	  	  		  GREEN = red.green * flag_blynk;
-  	  	  		  BLUE = red.blue * flag_blynk;
-  	  	  	  } break;
-  	  	  	  case 1:
-  	  	  	  {
-  	  	  		  RED = yellow.red * flag_blynk;
-  	  	  		  GREEN = yellow.green * flag_blynk;
-  	  	  		  BLUE = yellow.blue * flag_blynk;
-  	  	  	  } break;
-  	  	  	  case 2:
-  	  	  	  {
-  	  	  		  RED = green.red * flag_blynk;
-  	  	  		  GREEN = green.green * flag_blynk;
-  	  	  		  BLUE = green.blue * flag_blynk;
-  	  	  	  } break;
-		  }
-		  HAL_Delay((255-data.freq)*4);
-	  } else
-	  {
+			  flag_blynk =  1 - flag_blynk ;
+			  switch (data.channel) {
+  	  	  	  	  case 0:
+  	  	  	  		  RED = red.red * flag_blynk;
+  	  	  	  		  GREEN = red.green * flag_blynk;
+  	  	  	  		  BLUE = red.blue * flag_blynk;
+  	  	  	  		  break;
+  	  	  	  	  case 1:
+  	  	  	  		  RED = yellow.red * flag_blynk;
+  	  	  	  		  GREEN = yellow.green * flag_blynk;
+  	  	  	  		  BLUE = yellow.blue * flag_blynk;
+  	  	  	  		  break;
+  	  	  	  	  case 2:
+  	  	  	  		  RED = green.red * flag_blynk;
+  	  	  	  		  GREEN = green.green * flag_blynk;
+  	  	  	  		  BLUE = green.blue * flag_blynk;
+  	  	  	  		  break;
+			  }
+
+			  HAL_Delay((255-data.freq)*4);
+		  } else {
 //		  TIM1->CCR3 = 0;
 //		  TIM1->CCR2 = 0;
 //		  TIM1->CCR1 = 0;
-	  }
-	  if (flag_hardbit)
-	  {
+		  }
+	  if (flag_hardbit) {
 		  snprintf(str,sizeof(str),"%01u.%01u.%03u\n\r",(data.channel),(data.mode),(data.freq));
 		  CDC_Transmit_FS(str, 15);
 		  flag_hardbit = false;
 	  }
 
-	  if (flag_rgb_state )
-	  {
-		  switch (conf_channel)
-		  {
+	  if (flag_rgb_state ) {
+		  switch (conf_channel) {
 		  	  case 0:
-		  	  {
 		  		  red_value = red.red;
 		  		  green_value = red.green;
 		  		  blue_value = red.blue;
-		  	  } break;
+		  		  break;
 		  	  case 1:
-		  	  {
 		  		  red_value = yellow.red;
 		  		  green_value = yellow.green;
 		  		  blue_value = yellow.blue;
-		  	  } break;
+		  		  break;
 		  	  case 2:
-		  	  {
 		  		  red_value = green.red;
 		  		  green_value = green.green;
 		  		  blue_value = green.blue;
-		  	  } break;
+		  		  break;
 		  }
 		  flag_rgb_state = 0;
 		  snprintf(str,sizeof(str),"CH%01u:%02X%02X%02X\n\r",conf_channel,red_value,green_value,blue_value);
 		  CDC_Transmit_FS(str, 15);
 	  }
-
 	  osDelay(1);
   }
   /* USER CODE END 5 */ 
