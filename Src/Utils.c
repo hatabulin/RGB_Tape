@@ -6,6 +6,7 @@
  */
 
 #include "Utils.h"
+#include "string.h"
 
 void strcopy(char* main, char* second, int pos, int k) {
     if (pos > strlen(main)) {
