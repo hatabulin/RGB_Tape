@@ -173,16 +173,12 @@ static int8_t CDC_Receive_FS(uint8_t* pbuf, uint32_t *Len);
 /* USER CODE BEGIN PRIVATE_FUNCTIONS_DECLARATION */
 uint32_t hex2int(char* hex)
 {
-    uint32_t val = 0;
-    while (*hex)
-    {
-        // get current character then increment
+	uint32_t val = 0;
+    while (*hex) {
         uint8_t byte = *hex++;
-        // transform hex character to the 4bit equivalent number, using the ascii table indexes
         if (byte >= '0' && byte <= '9') byte = byte - '0';
         else if (byte >= 'a' && byte <='f') byte = byte - 'a' + 10;
         else if (byte >= 'A' && byte <='F') byte = byte - 'A' + 10;
-        // shift 4 to make space for new digit, and add the 4 bits of the new digit
         val = (val << 4) | (byte & 0xF);
     }
     return val;
@@ -321,33 +317,25 @@ static int8_t CDC_Receive_FS(uint8_t* Buf, uint32_t *Len)
 	char _data[] = {0,0,0};
 	strncpy(str_rx,(char*)Buf,*Len);
 	char* index ;
-	// разбор полета...
-    if  ((str_rx[0] > 0x2F) & (str_rx[0] < 0x3A) & (str_rx[1] == '.') & (str_rx[3] == '.') )
-    {
+	// СЂР°Р·Р±РѕСЂ РїРѕР»РµС‚Р°...
+    if  ((str_rx[0] > 0x2F) & (str_rx[0] < 0x3A) & (str_rx[1] == '.') & (str_rx[3] == '.') ) {
     	data.channel = str_rx[0] - 0x30;
-    	if ((str_rx[2]>0x2F) & (str_rx[2]<0x3A))
-    	{
+    	if ((str_rx[2]>0x2F) & (str_rx[2]<0x3A)) {
     		data.mode = str_rx[2] - 0x30; // mode 1 - NORMAL_MODE, 2- BLINK_MODE
-    		if ( (str_rx[4]>0x2F) & (str_rx[4]<0x3A) & (str_rx[5]>0x2F) & (str_rx[5]<0x3A) & (str_rx[6]>0x2F) & (str_rx[6]<0x3A) )
-    		{
+    		if ( (str_rx[4]>0x2F) & (str_rx[4]<0x3A) & (str_rx[5]>0x2F) & (str_rx[5]<0x3A) & (str_rx[6]>0x2F) & (str_rx[6]<0x3A) ) {
     			data.freq = (str_rx[4] - 0x30) * 100 + (str_rx[5] - 0x30) * 10 + (str_rx[6] - 0x30);
     			data.dirty = true;
     		}
     	}
-    } else
-    {
+    } else {
     	if (str_rx[0] == 's') flag_hardbit = true;
-    	else
-    	{
+    	else {
     	    index = strstr(str_rx,"CH");
-    	    if (index!=NULL)
-    	    {
+    	    if (index!=NULL) {
     	    	conf_channel = str_rx[2];
-    	    	if ( (conf_channel>0x2F) & (conf_channel < 0x33) )
-    			{
+    	    	if ( (conf_channel>0x2F) & (conf_channel < 0x33) ) {
     	    		conf_channel -= 0x30;
-    	    		if (str_rx[3] == ':')
-    	    		{
+    	    		if (str_rx[3] == ':') {
     	        		_data[0] = str_rx[4];
     	        		_data[1] = str_rx[5];
     	        		red_value = hex2int(_data);
@@ -360,31 +348,22 @@ static int8_t CDC_Receive_FS(uint8_t* Buf, uint32_t *Len)
     	        		flag_usb = CHANNEL_TUNNING;
     	    		} else flag_rgb_state = true;
     			}
-    	    } else
-    	    {
+    	    } else {
     	        index = strstr(str_rx,"SAVE_CFG");
     	        if (index!=NULL) flag_usb = SAVE_CFG;
-    	        else
-    	        {
+    	        else {
     	        	index = strstr(str_rx,"LOAD_CFG1");
-    	        	if(index!=NULL)
-    	        	{
+    	        	if(index!=NULL) {
     	        		CDC_Transmit_FS("CONFIG1:02E7-1EF0\n", 17);
     	        		CDC_Transmit_FS('\0', 0);
-    	        	}
-    	        	else
-    	        	{
+    	        	} else {
         	        	index = strstr(str_rx,"RGB_TAPE");
-        	        	if(index!=NULL)
-        	        	{
+        	        	if(index!=NULL) {
         	        		CDC_Transmit_FS((uint8_t*)"RGB_TAPE\n", 8);
         	        		CDC_Transmit_FS('\0', 0);
-        	        	}
-        	        	else
-        	        	{
+        	        	} else {
             	        	index = strstr(str_rx,"EFFECT_CONFIG");
-            	        	if(index!=NULL)
-            	         	{
+            	        	if(index!=NULL) {
             	        		strcopy(str_rx,_data,14,2); effectCONF.effectID = hex2int(_data);
             	        		strcopy(str_rx,_data,23,2); effectCONF.red_value = hex2int(_data);
             	        		strcopy(str_rx,_data,26,2); effectCONF.green_value = hex2int(_data);
@@ -426,9 +405,10 @@ uint8_t CDC_Transmit_FS(uint8_t* Buf, uint16_t Len)
   uint8_t result = USBD_OK;
   /* USER CODE BEGIN 7 */
   USBD_CDC_HandleTypeDef *hcdc = (USBD_CDC_HandleTypeDef*)hUsbDeviceFS.pClassData;
-  if (hcdc->TxState != 0){
+  if (hcdc->TxState != 0) {
     return USBD_BUSY;
   }
+
   USBD_CDC_SetTxBuffer(&hUsbDeviceFS, Buf, Len);
   result = USBD_CDC_TransmitPacket(&hUsbDeviceFS);
   /* USER CODE END 7 */
