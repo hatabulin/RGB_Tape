@@ -194,14 +194,12 @@ void TIM2_IRQHandler(void)
   HAL_TIM_IRQHandler(&htim2);
   /* USER CODE BEGIN TIM2_IRQn 1 */
       sec++;
-      if (sec>data.freq-1)
-      {
+      if (sec>data.freq-1) {
     	  sec=0;
-    	  switch (data.channel)
-    	  {
-	  	  	  case 0: { if (RED == 0) RED = 255; else RED = 0; } break;
-	  	  	  case 1: { if (GREEN == 0) GREEN = 255; else GREEN = 0; } break;
-	  	  	  case 2: { if (BLUE == 0) BLUE = 255; else BLUE = 0; } break;
+    	  switch (data.channel) {
+	  	  	  case 0: RED = 255 - RED; break;
+	  	  	  case 1: GREEN = 255 - GREEN;
+	  	  	  case 2: BLUE = 255 - BLUE;
     	  }
       }
 
